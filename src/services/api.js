@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = 'https://hospital-trustee-fiwe.vercel.app/';
+const API_BASE_URL = 'https://hospital-trustee-fiwe.vercel.app/api';
 
 // Create axios instance
 export const api = axios.create({
