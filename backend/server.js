@@ -27,9 +27,29 @@ const PORT = process.env.PORT || 5001;
 // --------------------
 // MIDDLEWARE
 // --------------------
-app.use(cors());
+
+// CORS configuration
+const corsOptions = {
+  origin: [
+    'http://localhost:5173', // Vite default port
+    'http://localhost:3000', // React default port
+    'http://localhost:3001', // Alternative React port
+    'http://localhost:5000', // Alternative port
+    'https://hospital-trustee-fiwe.vercel.app', // Production frontend
+    'https://hospital-trustee-h3cv.vercel.app', // Alternative frontend
+    'https://hospital-management-3-7z4c.onrender.com', // Old backend URL
+    'https://hospital-trustee.vercel.app' // Alternative frontend
+  ],
+  credentials: true,
+  optionsSuccessStatus: 200
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Serve static files from public directory
+app.use(express.static(path.join(__dirname, '../public')));
 
 // Handle favicon requests
 app.get('/favicon.ico', (req, res) => res.status(204).end());
@@ -91,7 +111,7 @@ app.use(errorHandler);
 // --------------------
 app.listen(PORT, () => {
   console.log('🚀 Server is running on port', PORT);
-  console.log(`📍 API URL: http://localhost:${PORT}`);
-  console.log(`📍 Health Check: http://localhost:${PORT}/`);
-  console.log('🌐 Production URL:', `https://hospital-trustee-1.onrender.com`);
+  console.log(`📍 API URL: https://hospital-trustee-fiwe.vercel.app/`);
+  console.log(`📍 API URL: https://hospital-trustee-fiwe.vercel.app/api/auth`);
+  console.log('🌐 Production URL:', `https://hospital-trustee-fiwe.vercel.app/`);
 });
