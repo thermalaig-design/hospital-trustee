@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { User, Users, Clock, FileText, UserPlus, Bell, ChevronRight, LogOut, Heart, Shield, Plus, ArrowRight, Pill, ShoppingCart, Calendar, Stethoscope, Building2, Phone, QrCode, Monitor, Brain, Package, FileCheck, Search, Filter, MapPin, Star, HelpCircle, BookOpen, Video, Headphones, Menu, X, Home as HomeIcon, Settings, UserCircle } from 'lucide-react';
 import Sidebar from './components/Sidebar';
+import { getProfile } from './services/api';
 
 /* eslint-disable react-refresh/only-export-components */
 const Home = ({ onNavigate, onLogout, isMember }) => {
@@ -19,18 +20,12 @@ const Home = ({ onNavigate, onLogout, isMember }) => {
           if (userId) {
             // Try to load from Supabase
             try {
-              const response = await fetch('https://hospital-trustee-fiwe.vercel.app/api/profile', {
-                headers: {
-                  'user-id': userId
-                }
-              });
-              
-              const data = await response.json();
-              if (data.success && data.profile) {
+              const response = await getProfile();
+              if (response.success && response.profile) {
                 // Map database fields to profile format
                 const mappedProfile = {
-                  name: data.profile.name || '',
-                  profilePhotoUrl: data.profile.profile_photo_url || ''
+                  name: response.profile.name || '',
+                  profilePhotoUrl: response.profile.profile_photo_url || ''
                 };
                 setUserProfile(mappedProfile);
                 return;
@@ -263,7 +258,7 @@ const Home = ({ onNavigate, onLogout, isMember }) => {
               <div className="relative flex items-center justify-center overflow-visible transform transition-all duration-700 group-hover:scale-110" style={{ transformStyle: 'preserve-3d' }}>
                 <div className="relative" style={{ transform: 'translateZ(40px) rotateX(10deg) rotateY(-8deg)' }}>
                   <img
-                    src="./assets/president.png"
+                    src="/assets/president.png"
                     alt="Dr. Meena Subhash Gupta"
                     className="w-full h-full object-cover rounded-2xl shadow-2xl transform transition-all duration-700 group-hover:scale-105"
                     style={{
