@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = 'https://hospital-management-3-7z4c.onrender.com/api';
+const API_BASE_URL = 'https://hospital-trustee-1.onrender.com';
 
 // Create axios instance
 export const api = axios.create({
