@@ -1,5 +1,5 @@
 // appointmentService.js - Frontend service for appointment booking
-const API_URL = 'https://hospital-trustee-1.onrender.com';
+const API_URL = 'https://hospital-trustee-fiwe.vercel.app/api';
 
 /**
  * Book a new appointment
