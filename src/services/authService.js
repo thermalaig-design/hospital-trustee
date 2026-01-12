@@ -1,5 +1,5 @@
 // authService.js - Frontend API calls
-const API_URL = 'https://hospital-trustee-1.onrender.com';
+const API_URL = 'https://hospital-trustee-fiwe.vercel.app/api/auth';
 
 export const checkPhoneNumber = async (phoneNumber) => {
   const response = await fetch(`${API_URL}/check-phone`, {
