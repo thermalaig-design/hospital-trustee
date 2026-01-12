@@ -19,7 +19,7 @@ const Home = ({ onNavigate, onLogout, isMember }) => {
           if (userId) {
             // Try to load from Supabase
             try {
-              const response = await fetch('https://hospital-management-3-7z4c.onrender.com/api/profile', {
+              const response = await fetch('https://hospital-trustee-fiwe.vercel.app/api/profile', {
                 headers: {
                   'user-id': userId
                 }
@@ -232,7 +232,10 @@ const Home = ({ onNavigate, onLogout, isMember }) => {
       <div className="pb-20"></div> */}
       {/* Sponsored By Banner - Footer */}
       <div className="banner-container mt-6 w-full">
-        <div className="banner-content bg-gradient-to-r from-indigo-800 to-indigo-900 rounded-2xl sm:rounded-3xl overflow-hidden shadow-2xl border-2 border-indigo-700">
+        <button 
+          onClick={() => onNavigate('sponsor-details')}
+          className="w-full bg-gradient-to-r from-indigo-800 to-indigo-900 rounded-2xl sm:rounded-3xl overflow-hidden shadow-2xl border-2 border-indigo-700 text-left"
+        >
           <div className="flex items-center justify-between p-1 sm:p-2">
             {/* Left Side - Text Content */}
             <div className="flex-1 pr-4">
@@ -244,7 +247,7 @@ const Home = ({ onNavigate, onLogout, isMember }) => {
               </div>
 
               {/* Doctor Name */}
-              <h2 className="text-lg sm:text-l md:text-3xl font-serif italic text-white leading-tight">
+              <h2 className="text-md sm:text-l md:text-lg font-serif italic text-white leading-tight">
                 Dr. Meena Subhash Gupta
               </h2>
             </div>
@@ -260,7 +263,7 @@ const Home = ({ onNavigate, onLogout, isMember }) => {
               <div className="relative flex items-center justify-center overflow-visible transform transition-all duration-700 group-hover:scale-110" style={{ transformStyle: 'preserve-3d' }}>
                 <div className="relative" style={{ transform: 'translateZ(40px) rotateX(10deg) rotateY(-8deg)' }}>
                   <img
-                    src="./src/assets/president.png"
+                    src="./assets/president.png"
                     alt="Dr. Meena Subhash Gupta"
                     className="w-full h-full object-cover rounded-2xl shadow-2xl transform transition-all duration-700 group-hover:scale-105"
                     style={{
@@ -288,7 +291,7 @@ const Home = ({ onNavigate, onLogout, isMember }) => {
               <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-12 h-12 bg-white/10 rounded-full blur-xl opacity-50" style={{ transform: 'translateZ(25px) translateX(-50%) translateY(-50%)' }}></div>
             </div>
           </div>
-        </div>
+        </button>
       </div>
       <style>{`
         .banner-container {
