@@ -289,7 +289,7 @@ const Home = ({ onNavigate, onLogout, isMember }) => {
         .banner-container {
           width: 100%;
           max-width: 100%;
-          margin-top: 1.5rem;
+          margin-top: 1.8rem;
         }
         
         .banner-content {
