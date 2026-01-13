@@ -222,7 +222,7 @@ const Home = ({ onNavigate, onLogout, isMember }) => {
         </div>
       </div>
       <br />
-      <br />
+      
       {/* Sponsored By Banner - Moved to Bottom */}
       <div className="banner-container mt-6 w-full">
         <button 
