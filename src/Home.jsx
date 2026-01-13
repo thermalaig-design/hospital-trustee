@@ -221,11 +221,8 @@ const Home = ({ onNavigate, onLogout, isMember }) => {
           ))}
         </div>
       </div>
-
       
-      {/* <div className="pb-20"></div>
-      <div className="pb-20"></div> */}
-      {/* Sponsored By Banner - Footer */}
+      {/* Sponsored By Banner - Moved to Bottom */}
       <div className="banner-container mt-6 w-full">
         <button 
           onClick={() => onNavigate('sponsor-details')}
