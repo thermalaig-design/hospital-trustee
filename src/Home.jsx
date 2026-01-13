@@ -101,7 +101,7 @@ const Home = ({ onNavigate, onLogout, isMember }) => {
   // ];
 
   return (
-    <div className="bg-white min-h-screen relative">
+    <div className="bg-white min-h-screen flex flex-col">
       {/* Navbar */}
       <div className="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between sticky top-0 z-50 shadow-sm">
         <button
@@ -197,34 +197,36 @@ const Home = ({ onNavigate, onLogout, isMember }) => {
           }
         `}</style>
       </div>
-
-      {/* Main Navigation Cards - Premium Design */}
-      <div className="px-4 sm:px-6 mt-4 sm:mt-6 mb-6 sm:mb-8">
-        <h2 className="text-base sm:text-lg font-bold text-gray-900 mb-3 sm:mb-4">Quick Actions</h2>
-        <div className="grid grid-cols-2 gap-3 sm:gap-4">
-          {quickActions.map((action) => (
-            <button
-              key={action.id}
-              onClick={() => onNavigate(action.screen)}
-              disabled={action.memberOnly && !isMember}
-              className={`bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-5 shadow-md border-2 border-gray-100 flex flex-col items-center text-center transition-all hover:shadow-xl hover:border-indigo-200 hover:-translate-y-1 active:scale-95 group relative overflow-hidden ${action.memberOnly && !isMember ? 'opacity-60' : ''}`}
-            >
-              <div className={`${action.color} p-3 sm:p-4 rounded-xl sm:rounded-2xl mb-2 sm:mb-3 group-hover:scale-110 transition-transform shadow-sm`}>
-                <action.icon className={`h-6 w-6 sm:h-7 sm:w-7 ${action.iconColor}`} />
-              </div>
-              <h3 className="font-bold text-gray-900 text-sm sm:text-base leading-tight mb-1 sm:mb-1.5">{action.title}</h3>
-              <p className="text-gray-600 text-[10px] sm:text-xs font-medium leading-snug">{action.desc}</p>
-              {action.memberOnly && !isMember && (
-                <span className="absolute top-3 right-3 bg-gray-100 text-gray-400 p-1.5 rounded-full shadow-sm"><Shield className="h-3.5 w-3.5" /></span>
-              )}
-            </button>
-          ))}
+      
+      {/* Main Content - Flex grow to push banner to bottom */}
+      <div className="flex-grow">
+        {/* Main Navigation Cards - Premium Design */}
+        <div className="px-4 sm:px-6 mt-4 sm:mt-6 mb-6 sm:mb-8">
+          <h2 className="text-base sm:text-lg font-bold text-gray-900 mb-3 sm:mb-4">Quick Actions</h2>
+          <div className="grid grid-cols-2 gap-3 sm:gap-4">
+            {quickActions.map((action) => (
+              <button
+                key={action.id}
+                onClick={() => onNavigate(action.screen)}
+                disabled={action.memberOnly && !isMember}
+                className={`bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-5 shadow-md border-2 border-gray-100 flex flex-col items-center text-center transition-all hover:shadow-xl hover:border-indigo-200 hover:-translate-y-1 active:scale-95 group relative overflow-hidden ${action.memberOnly && !isMember ? 'opacity-60' : ''}`}
+              >
+                <div className={`${action.color} p-3 sm:p-4 rounded-xl sm:rounded-2xl mb-2 sm:mb-3 group-hover:scale-110 transition-transform shadow-sm`}>
+                  <action.icon className={`h-6 w-6 sm:h-7 sm:w-7 ${action.iconColor}`} />
+                </div>
+                <h3 className="font-bold text-gray-900 text-sm sm:text-base leading-tight mb-1 sm:mb-1.5">{action.title}</h3>
+                <p className="text-gray-600 text-[10px] sm:text-xs font-medium leading-snug">{action.desc}</p>
+                {action.memberOnly && !isMember && (
+                  <span className="absolute top-3 right-3 bg-gray-100 text-gray-400 p-1.5 rounded-full shadow-sm"><Shield className="h-3.5 w-3.5" /></span>
+                )}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
-  
-      
-      {/* Sponsored By Banner - Moved to Bottom */}
-      <div className="banner-container mt-1 w-full">
+
+      {/* Sponsored By Banner - Moved to bottom */}
+      <div className="banner-container w-full">
         <button 
           onClick={() => onNavigate('sponsor-details')}
           className="w-full bg-gradient-to-r from-indigo-800 to-indigo-900 rounded-2xl sm:rounded-3xl overflow-hidden shadow-2xl border-2 border-indigo-700 text-left"
@@ -290,7 +292,7 @@ const Home = ({ onNavigate, onLogout, isMember }) => {
         .banner-container {
           width: 100%;
           max-width: 100%;
-          margin-top: 1rem;
+          margin-top: 1.2rem;
         }
         
         .banner-content {
