@@ -201,7 +201,7 @@ const Home = ({ onNavigate, onLogout, isMember }) => {
       {/* Main Content - Flex grow to push banner to bottom */}
       <div className="flex-grow">
         {/* Main Navigation Cards - Premium Design */}
-        <div className="px-4 sm:px-6 mt-4 sm:mt-6 mb-6 sm:mb-8">
+        <div className="px-4 sm:px-6 mt-4 sm:mt-6 mb-3 sm:mb-8">
           <h2 className="text-base sm:text-lg font-bold text-gray-900 mb-3 sm:mb-4">Quick Actions</h2>
           <div className="grid grid-cols-2 gap-3 sm:gap-4">
             {quickActions.map((action) => (
