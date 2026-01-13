@@ -221,7 +221,7 @@ const Home = ({ onNavigate, onLogout, isMember }) => {
           ))}
         </div>
       </div>
-      <br />
+  
       
       {/* Sponsored By Banner - Moved to Bottom */}
       <div className="banner-container mt-6 w-full">
@@ -290,7 +290,7 @@ const Home = ({ onNavigate, onLogout, isMember }) => {
         .banner-container {
           width: 100%;
           max-width: 100%;
-          margin-top: 1.8rem;
+          margin-top: 1.5rem;
         }
         
         .banner-content {
