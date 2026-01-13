@@ -210,6 +210,28 @@ export const deleteReferral = async (referralId) => {
 };
 
 // Preload commonly used data
+// Get user profile
+export const getProfile = async () => {
+  try {
+    const user = localStorage.getItem('user');
+    const userId = user ? JSON.parse(user).Mobile || JSON.parse(user).mobile || JSON.parse(user).id : null;
+    
+    if (!userId) {
+      throw new Error('No user found in localStorage');
+    }
+    
+    const response = await api.get('/profile', {
+      headers: {
+        'user-id': userId
+      }
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching profile:', error);
+    throw error;
+  }
+};
+
 export const preloadCommonData = async () => {
   try {
     // Load small amounts of data in parallel for quick initial load
