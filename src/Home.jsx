@@ -200,9 +200,9 @@ const Home = ({ onNavigate, onLogout, isMember }) => {
       
       {/* Main Content - Flex grow to push banner to bottom */}
         {/* Main Navigation Cards - Premium Design */}
-        <div className="px-4 sm:px-6 mt-4 sm:mt-6 mb-3 sm:mb-5">  {/* Reduced bottom margin to decrease gap */}
+        <div className="px-4 sm:px-6 mt-6 sm:mt-6 ">  {/* Reduced bottom margin to decrease gap */}
           <h2 className="text-base sm:text-lg font-bold text-gray-900 mb-3 sm:mb-4">Quick Actions</h2>
-          <div className="grid grid-cols-2 gap-3 sm:gap-4">
+          <div className="grid grid-cols-2 gap-3 mt-5 sm:gap-4">
             {quickActions.map((action) => (
               <button
                 key={action.id}
@@ -225,7 +225,7 @@ const Home = ({ onNavigate, onLogout, isMember }) => {
 
 
         {/* Sponsored By Banner - Moved after quick actions */}
-        <div className="banner-container w-full ">  {/* Added padding for consistency */}
+        <div className="banner-container w-full mt-5 mb-0 " style={{ marginTop: '3rem' }}>  {/* Added padding for consistency */}
           <button 
             onClick={() => onNavigate('sponsor-details')}
             className="w-full bg-gradient-to-r from-indigo-800 to-indigo-900 p-4 overflow-hidden shadow-2xl border-2 border-indigo-700 text-left"
