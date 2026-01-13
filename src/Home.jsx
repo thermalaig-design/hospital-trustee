@@ -201,7 +201,8 @@ const Home = ({ onNavigate, onLogout, isMember }) => {
       {/* Main Content - Flex grow to push banner to bottom */}
       <div className="flex-grow">
         {/* Main Navigation Cards - Premium Design */}
-         <div className="px-4 sm:px-6 mt-4 sm:mt-6 mb-1 sm:mb-1">  {/* Reduced bottom margin to decrease gap */}
+            {/* Main Navigation Cards - Premium Design */}
+        <div className="px-4 sm:px-6 mt-4 sm:mt-6 mb-4 sm:mb-6">
           <h2 className="text-base sm:text-lg font-bold text-gray-900 mb-3 sm:mb-4">Quick Actions</h2>
           <div className="grid grid-cols-2 gap-3 sm:gap-4">
             {quickActions.map((action) => (
@@ -222,71 +223,66 @@ const Home = ({ onNavigate, onLogout, isMember }) => {
               </button>
             ))}
           </div>
-        </div>
+          </div>
       </div>
 
       {/* Sponsored By Banner - Moved to bottom */}
-      <div className="banner-container w-full">
-        <button 
-          onClick={() => onNavigate('sponsor-details')}
-          className="w-full bg-gradient-to-r from-indigo-800 to-indigo-900 rounded-2xl sm:rounded-3xl overflow-hidden shadow-2xl border-2 border-indigo-700 text-left"
-        >
-          <div className="flex items-center justify-between p-1 sm:p-2">
-            {/* Left Side - Text Content */}
-            <div className="flex-1 pr-4">
-              {/* Decorative Line */}
-              <div className="flex items-center gap-2 mb-2">
-                <div className="h-px bg-gradient-to-r from-transparent via-indigo-300 to-indigo-300 flex-1"></div>
-                <span className="text-indigo-200 text-[10px] sm:text-xs font-light tracking-widest">SPONSORED BY</span>
-                <div className="h-px bg-gradient-to-r from-indigo-300 to-indigo-300 to-transparent flex-1"></div>
-              </div>
-
-              {/* Doctor Name */}
-              <h2 className="text-md sm:text-l md:text-lg font-serif italic text-white leading-tight">
-                Dr. Meena Subhash Gupta
-              </h2>
-            </div>
-
-            {/* Right Side - 3D Realistic Image */}
-            <div className="flex-shrink-0 w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 relative group" style={{ perspective: '1200px', transformStyle: 'preserve-3d' }}>
-              {/* Enhanced 3D Shadow Layers */}
-              <div className="absolute inset-0 bg-black/30 rounded-2xl transform translate-x-3 translate-y-3 blur-md opacity-50" style={{ transform: 'translateZ(-10px)' }}></div>
-              <div className="absolute inset-0 bg-black/15 rounded-2xl transform translate-x-2 translate-y-2 blur-lg opacity-70" style={{ transform: 'translateZ(-5px)' }}></div>
-              <div className="absolute inset-0 bg-black/5 rounded-2xl transform translate-x-1 translate-y-1 blur-xl opacity-80" style={{ transform: 'translateZ(-2px)' }}></div>
-
-              {/* Realistic 3D Image Container */}
-              <div className="relative flex items-center justify-center overflow-visible transform transition-all duration-700 group-hover:scale-110" style={{ transformStyle: 'preserve-3d' }}>
-                <div className="relative" style={{ transform: 'translateZ(40px) rotateX(10deg) rotateY(-8deg)' }}>
-                  <img
-                    src="/assets/president.png"
-                    alt="Dr. Meena Subhash Gupta"
-                    className="w-full h-full object-cover rounded-2xl shadow-2xl transform transition-all duration-700 group-hover:scale-105"
-                    style={{
-                      filter: 'drop-shadow(0 20px 35px rgba(0,0,0,0.5)) drop-shadow(0 8px 15px rgba(0,0,0,0.4)) drop-shadow(0 3px 6px rgba(0,0,0,0.3))',
-                      boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.1), 0 0 20px rgba(0,0,0,0.3)'
-                    }}
-                    onError={(e) => {
-                      e.target.style.display = 'none';
-                      e.target.nextSibling.style.display = 'flex';
-                    }}
-                  />
-                  {/* Realistic Lighting Overlay */}
-                  <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-white/20 via-transparent to-black/30 pointer-events-none"></div>
-                  {/* Fallback placeholder */}
-                  <div className="text-center" style={{ display: 'none' }}>
-                    <User className="h-10 w-10 sm:h-12 sm:w-12 text-gray-400 mx-auto mb-1" />
-                    <p className="text-gray-400 text-[10px] sm:text-xs font-medium">Photo</p>
-                  </div>
+        <div className="banner-container w-full px-4 sm:px-6">
+         <button 
+            onClick={() => onNavigate('sponsor-details')}
+            className="w-full bg-gradient-to-r from-indigo-800 to-indigo-900 rounded-2xl sm:rounded-3xl overflow-hidden shadow-2xl border-2 border-indigo-700 text-left"
+          >
+                      <div className="flex items-center justify-between p-1 sm:p-2">
+              {/* Left Side - Text Content */}
+              <div className="flex-1 pr-4">
+                {/* Decorative Line */}
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="h-px bg-gradient-to-r from-transparent via-indigo-300 to-indigo-300 flex-1"></div>
+                  <span className="text-indigo-200 text-[10px] sm:text-xs font-light tracking-widest">SPONSORED BY</span>
+                  <div className="h-px bg-gradient-to-r from-indigo-300 to-indigo-300 to-transparent flex-1"></div>
                 </div>
+
+
+           {/* Doctor Name */}
+                <h2 className="text-md sm:text-l md:text-lg font-serif italic text-white leading-tight">
+                  Dr. Meena Subhash Gupta
+                </h2>
               </div>
 
+      {/* Realistic 3D Image Container */}
+                <div className="relative flex items-center justify-center overflow-visible transform transition-all duration-700 group-hover:scale-110" style={{ transformStyle: 'preserve-3d' }}>
+                  <div className="relative" style={{ transform: 'translateZ(40px) rotateX(10deg) rotateY(-8deg)' }}>
+                    <img
+                      src="/assets/president.png"
+                      alt="Dr. Meena Subhash Gupta"
+                      className="w-full h-full object-cover rounded-2xl shadow-2xl transform transition-all duration-700 group-hover:scale-105"
+                      style={{
+                        filter: 'drop-shadow(0 20px 35px rgba(0,0,0,0.5)) drop-shadow(0 8px 15px rgba(0,0,0,0.4)) drop-shadow(0 3px 6px rgba(0,0,0,0.3))',
+                        boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.1), 0 0 20px rgba(0,0,0,0.3)'
+                      }}
+                      onError={(e) => {
+                        e.target.style.display = 'none';
+                        e.target.nextSibling.style.display = 'flex';
+                      }}
+                    />
+                    {/* Realistic Lighting Overlay */}
+                    <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-white/20 via-transparent to-black/30 pointer-events-none"></div>
+                    {/* Fallback placeholder */}
+                    <div className="text-center" style={{ display: 'none' }}>
+                      <User className="h-10 w-10 sm:h-12 sm:w-12 text-gray-400 mx-auto mb-1" />
+                      <p className="text-gray-400 text-[10px] sm:text-xs font-medium">Photo</p>
+                    </div>
+                  </div>
+               
               {/* Enhanced 3D Light Effects */}
-              <div className="absolute top-2 left-2 w-6 h-6 bg-white/40 rounded-full blur-lg opacity-80" style={{ transform: 'translateZ(20px)' }}></div>
-              <div className="absolute bottom-2 right-2 w-4 h-4 bg-white/20 rounded-full blur-md opacity-60" style={{ transform: 'translateZ(15px)' }}></div>
-              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-12 h-12 bg-white/10 rounded-full blur-xl opacity-50" style={{ transform: 'translateZ(25px) translateX(-50%) translateY(-50%)' }}></div>
+              {/* Enhanced 3D Light Effects */}
+                <div className="absolute top-2 left-2 w-6 h-6 bg-white/40 rounded-full blur-lg opacity-80" style={{ transform: 'translateZ(20px)' }}></div>
+                <div className="absolute bottom-2 right-2 w-4 h-4 bg-white/20 rounded-full blur-md opacity-60" style={{ transform: 'translateZ(15px)' }}></div>
+                <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-12 h-12 bg-white/10 rounded-full blur-xl opacity-50" style={{ transform: 'translateZ(25px) translateX(-50%) translateY(-50%)' }}></div>
+              </div>
             </div>
-          </div>
-        </button>
+          </button>
+        
       </div>
       <style>{`
         .banner-container {
