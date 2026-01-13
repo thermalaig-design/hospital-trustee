@@ -224,7 +224,7 @@ const Home = ({ onNavigate, onLogout, isMember }) => {
   
       
       {/* Sponsored By Banner - Moved to Bottom */}
-      <div className="banner-container mt-4 w-full">
+      <div className="banner-container mt-1 w-full">
         <button 
           onClick={() => onNavigate('sponsor-details')}
           className="w-full bg-gradient-to-r from-indigo-800 to-indigo-900 rounded-2xl sm:rounded-3xl overflow-hidden shadow-2xl border-2 border-indigo-700 text-left"
