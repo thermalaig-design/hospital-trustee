@@ -227,16 +227,16 @@ const Home = ({ onNavigate, onLogout, isMember }) => {
       </div>
 
       {/* Sponsored By Banner - Moved to bottom */}
-        <div className="banner-container w-full px-4 sm:px-6">
+        <div className="banner-container w-full">
          <button 
             onClick={() => onNavigate('sponsor-details')}
-            className="w-full bg-gradient-to-r from-indigo-800 to-indigo-900 rounded-2xl sm:rounded-3xl overflow-hidden shadow-2xl border-2 border-indigo-700 text-left"
+            className="w-full bg-gradient-to-r from-indigo-800 to-indigo-900 overflow-hidden shadow-2xl border-2 border-indigo-700 text-left"
           >
-                      <div className="flex items-center justify-between p-1 sm:p-2">
+                      <div className="flex items-center justify-between p-0.5 sm:p-1">  {/* Reduced padding to make banner shorter */}
               {/* Left Side - Text Content */}
               <div className="flex-1 pr-4">
                 {/* Decorative Line */}
-                <div className="flex items-center gap-2 mb-2">
+                <div className="flex items-center gap-2 mb-1">  {/* Reduced margin-bottom */}
                   <div className="h-px bg-gradient-to-r from-transparent via-indigo-300 to-indigo-300 flex-1"></div>
                   <span className="text-indigo-200 text-[10px] sm:text-xs font-light tracking-widest">SPONSORED BY</span>
                   <div className="h-px bg-gradient-to-r from-indigo-300 to-indigo-300 to-transparent flex-1"></div>
@@ -244,13 +244,13 @@ const Home = ({ onNavigate, onLogout, isMember }) => {
 
 
            {/* Doctor Name */}
-                <h2 className="text-md sm:text-l md:text-lg font-serif italic text-white leading-tight">
+                <h2 className="text-sm sm:text-base md:text-lg font-serif italic text-white leading-tight">  {/* Reduced text size */}
                   Dr. Meena Subhash Gupta
                 </h2>
               </div>
 
       {/* Realistic 3D Image Container */}
-                <div className="relative flex items-center justify-center overflow-visible transform transition-all duration-700 group-hover:scale-110" style={{ transformStyle: 'preserve-3d' }}>
+                <div className="flex-shrink-0 w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 relative group" style={{ perspective: '1200px', transformStyle: 'preserve-3d' }}>  {/* Reduced image container size */}
                   <div className="relative" style={{ transform: 'translateZ(40px) rotateX(10deg) rotateY(-8deg)' }}>
                     <img
                       src="/assets/president.png"
@@ -269,19 +269,20 @@ const Home = ({ onNavigate, onLogout, isMember }) => {
                     <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-white/20 via-transparent to-black/30 pointer-events-none"></div>
                     {/* Fallback placeholder */}
                     <div className="text-center" style={{ display: 'none' }}>
-                      <User className="h-10 w-10 sm:h-12 sm:w-12 text-gray-400 mx-auto mb-1" />
+                      <User className="h-8 w-8 sm:h-10 sm:w-10 text-gray-400 mx-auto mb-1" />  {/* Reduced fallback size */}
                       <p className="text-gray-400 text-[10px] sm:text-xs font-medium">Photo</p>
                     </div>
                   </div>
                
               {/* Enhanced 3D Light Effects */}
               {/* Enhanced 3D Light Effects */}
-                <div className="absolute top-2 left-2 w-6 h-6 bg-white/40 rounded-full blur-lg opacity-80" style={{ transform: 'translateZ(20px)' }}></div>
-                <div className="absolute bottom-2 right-2 w-4 h-4 bg-white/20 rounded-full blur-md opacity-60" style={{ transform: 'translateZ(15px)' }}></div>
-                <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-12 h-12 bg-white/10 rounded-full blur-xl opacity-50" style={{ transform: 'translateZ(25px) translateX(-50%) translateY(-50%)' }}></div>
+                <div className="absolute top-1 left-1 w-4 h-4 bg-white/40 rounded-full blur-lg opacity-80" style={{ transform: 'translateZ(20px)' }}></div>  {/* Reduced light effect sizes */}
+                <div className="absolute bottom-1 right-1 w-3 h-3 bg-white/20 rounded-full blur-md opacity-60" style={{ transform: 'translateZ(15px)' }}></div>
+                <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-8 h-8 bg-white/10 rounded-full blur-xl opacity-50" style={{ transform: 'translateZ(25px) translateX(-50%) translateY(-50%)' }}></div>
               </div>
             </div>
           </button>
+
         
       </div>
       <style>{`
