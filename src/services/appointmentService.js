@@ -1,5 +1,9 @@
 // appointmentService.js - Frontend service for appointment booking
+<<<<<<< HEAD
 import { api } from './api';
+=======
+const API_URL = 'https://hospital-trustee-fiwe.vercel.app/api';
+>>>>>>> f5e4323890410195852054ebdc9c05090ad796f2
 
 /**
  * Book a new appointment

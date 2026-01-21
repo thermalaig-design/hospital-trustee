@@ -1,7 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { User, Users, Clock, FileText, UserPlus, Bell, ChevronRight, LogOut, Heart, Shield, Plus, ArrowRight, Pill, ShoppingCart, Calendar, Stethoscope, Building2, Phone, QrCode, Monitor, Brain, Package, FileCheck, Search, Filter, MapPin, Star, HelpCircle, BookOpen, Video, Headphones, Menu, X, Home as HomeIcon, Settings, UserCircle } from 'lucide-react';
 import Sidebar from './components/Sidebar';
+<<<<<<< HEAD
 import { getProfile, getMarqueeUpdates, getSponsors } from './services/api';
+=======
+import { getProfile } from './services/api';
+>>>>>>> f5e4323890410195852054ebdc9c05090ad796f2
 
 /* eslint-disable react-refresh/only-export-components */
 const Home = ({ onNavigate, onLogout, isMember }) => {
@@ -277,9 +281,15 @@ const Home = ({ onNavigate, onLogout, isMember }) => {
                   <div className="h-px bg-gradient-to-r from-indigo-300 to-indigo-300 to-transparent flex-1"></div>
                 </div>
 
+<<<<<<< HEAD
                 {/* Sponsor Name - Dynamic */}
                 <h2 className="text-sm sm:text-base md:text-lg font-serif italic text-white leading-tight">
                   {sponsor ? sponsor.name : 'Dr. Meena Subhash Gupta'}
+=======
+                {/* Doctor Name */}
+                <h2 className="text-sm sm:text-base md:text-lg font-serif italic text-white leading-tight">
+                  Dr. Meena Subhash Gupta
+>>>>>>> f5e4323890410195852054ebdc9c05090ad796f2
                 </h2>
               </div>
 
@@ -294,8 +304,13 @@ const Home = ({ onNavigate, onLogout, isMember }) => {
                 <div className="relative flex items-center justify-center overflow-visible transform transition-all duration-700 group-hover:scale-110" style={{ transformStyle: 'preserve-3d' }}>
                   <div className="relative" style={{ transform: 'translateZ(40px) rotateX(10deg) rotateY(-8deg)' }}>
                     <img
+<<<<<<< HEAD
                       src={sponsor ? sponsor.photo_url : '/assets/president.png'}
                       alt={sponsor ? sponsor.name : 'Dr. Meena Subhash Gupta'}
+=======
+                      src="/assets/president.png"
+                      alt="Dr. Meena Subhash Gupta"
+>>>>>>> f5e4323890410195852054ebdc9c05090ad796f2
                       className="w-full h-full object-cover rounded-2xl shadow-2xl transform transition-all duration-700 group-hover:scale-105"
                       style={{
                         filter: 'drop-shadow(0 20px 35px rgba(0,0,0,0.5)) drop-shadow(0 8px 15px rgba(0,0,0,0.4)) drop-shadow(0 3px 6px rgba(0,0,0,0.3))',

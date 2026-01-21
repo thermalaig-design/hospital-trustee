@@ -1,7 +1,11 @@
 // authService.js - Frontend API calls
+<<<<<<< HEAD
 const API_URL = import.meta.env.DEV 
   ? 'http://localhost:5001/api/auth' 
   : 'https://hospital-trustee-fiwe.vercel.app/api/auth';
+=======
+const API_URL = 'https://hospital-trustee-fiwe.vercel.app/api/auth';
+>>>>>>> f5e4323890410195852054ebdc9c05090ad796f2
 
 /**
  * Check phone number and send OTP
@@ -24,6 +28,7 @@ export const checkPhoneNumber = async (phoneNumber) => {
   }
 };
 
+<<<<<<< HEAD
 /**
  * Verify OTP
  */
@@ -47,3 +52,6 @@ export const verifyOTP = async (phoneNumber, otp) => {
     throw error;
   }
 };
+=======
+// Removed OTP-related functions
+>>>>>>> f5e4323890410195852054ebdc9c05090ad796f2

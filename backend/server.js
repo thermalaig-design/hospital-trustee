@@ -30,6 +30,7 @@ const PORT = process.env.PORT || 5001;
 // MIDDLEWARE
 // --------------------
 
+<<<<<<< HEAD
 // CORS configuration
 const corsOptions = {
   origin: [
@@ -47,6 +48,10 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
+=======
+
+app.use(cors());
+>>>>>>> f5e4323890410195852054ebdc9c05090ad796f2
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -122,4 +127,8 @@ app.listen(PORT, () => {
   console.log(`📍 API URL: https://hospital-trustee-fiwe.vercel.app/`);
   console.log(`📍 API URL: https://hospital-trustee-fiwe.vercel.app/api/auth`);
   console.log('🌐 Production URL:', `https://hospital-trustee-fiwe.vercel.app/`);
+<<<<<<< HEAD
 });
+=======
+});
+>>>>>>> f5e4323890410195852054ebdc9c05090ad796f2
