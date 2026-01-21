@@ -87,7 +87,7 @@ const Profile = ({ onNavigate, onProfileUpdate }) => {
       }
 
       // Try to load from Supabase
-      const response = await fetch('http://localhost:5001/api/profile', {
+      const response = await fetch('https://hospital-trustee-fiwe.vercel.app/api/profile', {
         headers: {
           'user-id': userId
         }
@@ -268,7 +268,7 @@ const Profile = ({ onNavigate, onProfileUpdate }) => {
         formData.append('profilePhoto', profilePhotoFile);
       }
 
-      const response = await fetch('http://localhost:5001/api/profile/save', {
+      const response = await fetch('https://hospital-trustee-fiwe.vercel.app/api/profile/save', {
         method: 'POST',
         headers: {
           'user-id': userId

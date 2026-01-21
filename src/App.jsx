@@ -13,6 +13,8 @@ import HealthcareTrusteeDirectory from './HealthcareTrusteeDirectory';
 import MemberDetails from './MemberDetails';
 import CommitteeMembers from './CommitteeMembers';
 import ProtectedRoute from './ProtectedRoute';
+import SponsorDetails from './SponsorDetails';
+import AdminPanel from './admin/AdminPanel';
 
 const HospitalTrusteeApp = () => {
   const navigate = useNavigate();
@@ -83,7 +85,9 @@ const HospitalTrusteeApp = () => {
         'reports': '/reports',
         'reference': '/reference',
         'notices': '/notices',
-        'committee-members': '/committee-members'
+        'committee-members': '/committee-members',
+        'sponsor-details': '/sponsor-details',
+        'admin': '/admin'
       };
       const route = routeMap[screen] || '/';
       navigate(route);
@@ -302,6 +306,28 @@ const HospitalTrusteeApp = () => {
               ) : (
                 <Navigate to="/directory" replace />
               )}
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/sponsor-details" 
+          element={
+            <ProtectedRoute>
+              <SponsorDetails onBack={() => window.history.back()} />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/admin" 
+          element={
+            <ProtectedRoute>
+              <AdminPanel 
+                onNavigate={handleNavigate}
+                onLogout={() => {
+                  localStorage.removeItem('isLoggedIn');
+                  navigate('/login');
+                }}
+              />
             </ProtectedRoute>
           } 
         />

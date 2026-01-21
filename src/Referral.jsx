@@ -187,7 +187,7 @@ const Referral = ({ onNavigate, referenceView, setReferenceView, newReference, s
       const response = await createReferral(referralData);
       
       if (response.success) {
-        alert('Reference added successfully! Email notification sent.');
+        alert('Referral sent successfully');
         setNewReference({
           patientName: '',
           age: '',

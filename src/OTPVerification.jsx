@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { verifyOTP } from './services/authService';
 import { fetchDirectoryData } from './services/directoryService';
 
 function OTPVerification() {
@@ -19,23 +20,37 @@ function OTPVerification() {
     setError('');
 
     try {
-      // Hardcoded OTP validation - only 123456 is valid
-      if (otp === '123456') {
-        // Store user in localStorage and redirect to home
-        if (user) {
-          localStorage.setItem('user', JSON.stringify(user));
-          localStorage.setItem('isLoggedIn', 'true');
-          
-          // Pre-load directory data in background to avoid loading on directory click
-          fetchDirectoryData().catch(err => console.warn('Failed to pre-load directory data:', err));
-          
-          navigate('/');
-        } else {
-          setError('User data not found. Please try again.');
-        }
-      } else {
-        setError('Invalid OTP. Please enter 123456 to continue.');
+      console.log('🔍 Verifying OTP:', otp);
+      
+      // Verify OTP with backend
+      const result = await verifyOTP(phoneNumber, otp);
+      
+      console.log('📞 API Response:', result);
+      
+      if (!result.success) {
+        setError(result.message || 'Invalid OTP. Please try again.');
+        setLoading(false);
+        return;
       }
+
+      // OTP verified successfully
+      console.log('✅ OTP verified successfully');
+      
+      // Store user in localStorage and redirect to home
+      if (user) {
+        localStorage.setItem('user', JSON.stringify(user));
+        localStorage.setItem('isLoggedIn', 'true');
+        
+        // Pre-load directory data in background
+        fetchDirectoryData().catch(err => 
+          console.warn('Failed to pre-load directory data:', err)
+        );
+        
+        navigate('/');
+      } else {
+        setError('User data not found. Please try again.');
+      }
+      
     } catch (error) {
       console.error('❌ Error verifying OTP:', error);
       setError('Failed to verify OTP. Please try again.');
@@ -56,7 +71,7 @@ function OTPVerification() {
             <div className="bg-white p-4 rounded-3xl shadow-lg border border-gray-100">
               <img 
                 src="https://slelguoygbfzlpylpxfs.supabase.co/storage/v1/render/image/public/document-uploads/image-1767090787454.png?width=8000&height=8000&resize=contain" 
-                alt="Maharaja Agarsen Hospital Logo" 
+                alt="Maharaja Agrasen Hospital Logo" 
                 className="h-16 w-16 object-contain" 
               />
             </div>
@@ -64,8 +79,8 @@ function OTPVerification() {
           <h2 className="text-2xl font-bold text-gray-900 mb-2">Verify OTP</h2>
           <div className="w-24 h-1 bg-gradient-to-r from-transparent via-indigo-500 to-transparent mx-auto mt-3 mb-4 rounded-full"></div>
           <p className="text-gray-600 text-base mt-4">
-            Enter 123456 to continue
-            {phoneNumber && <span className="block mt-2 text-sm text-gray-500">Sent to: {phoneNumber}</span>}
+            Enter the 6-digit OTP sent to
+            {phoneNumber && <span className="block mt-2 font-semibold text-gray-800">{phoneNumber}</span>}
           </p>
         </div>
         
@@ -74,7 +89,7 @@ function OTPVerification() {
             <label className="block text-base font-semibold text-gray-800 mb-3">OTP Code</label>
             <input
               type="text"
-              placeholder="Enter OTP"
+              placeholder="Enter 6-digit OTP"
               value={otp}
               onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
               maxLength={6}
@@ -99,13 +114,25 @@ function OTPVerification() {
             </button>
             <button 
               type="submit" 
-              disabled={loading}
+              disabled={loading || otp.length !== 6}
               className="flex-1 bg-indigo-600 text-white py-4 rounded-2xl font-bold text-base shadow-lg hover:bg-indigo-700 hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98]"
             >
               {loading ? 'Verifying...' : 'Verify OTP'}
             </button>
           </div>
         </form>
+        
+        <div className="mt-6 text-center">
+          <p className="text-gray-500 text-sm">
+            Didn't receive the OTP? 
+            <button 
+              onClick={handleBack}
+              className="ml-1 text-indigo-600 font-semibold hover:text-indigo-700"
+            >
+              Try again
+            </button>
+          </p>
+        </div>
       </div>
     </div>
   );

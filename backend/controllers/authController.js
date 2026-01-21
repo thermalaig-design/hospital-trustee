@@ -1,7 +1,7 @@
-import { initializePhoneAuth } from '../services/otpService.js';
+import { initializePhoneAuth, verifyOTP } from '../services/otpService.js';
 
 /**
- * Check if phone number exists in system (before sending OTP)
+ * Check phone and send OTP
  */
 export const checkPhone = async (req, res, next) => {
   try {
@@ -24,7 +24,7 @@ export const checkPhone = async (req, res, next) => {
       });
     }
     
-    console.log(`📱 Checking phone: ${cleanPhone}`);
+    console.log(`📱 Checking phone and sending OTP: ${cleanPhone}`);
     
     const result = await initializePhoneAuth(cleanPhone);
     
@@ -34,15 +34,58 @@ export const checkPhone = async (req, res, next) => {
     
     res.status(200).json({
       success: true,
-      message: 'Phone number verified in database',
+      message: 'OTP sent successfully',
       data: {
         phoneNumber: result.data.phoneNumber,
-        user: result.data.user
+        user: result.data.user,
+        requestId: result.data.requestId
       }
     });
     
   } catch (error) {
-    console.error('Error in checkPhone:', error);
+    console.error('❌ Error in checkPhone:', error);
+    next(error);
+  }
+};
+
+/**
+ * Verify OTP
+ */
+export const verifyOTPController = async (req, res, next) => {
+  try {
+    const { phoneNumber, otp } = req.body;
+    
+    // Validate input
+    if (!phoneNumber || !otp) {
+      return res.status(400).json({
+        success: false,
+        message: 'Phone number and OTP are required'
+      });
+    }
+    
+    // Validate OTP format (6 digits)
+    if (!/^\d{6}$/.test(otp)) {
+      return res.status(400).json({
+        success: false,
+        message: 'OTP must be 6 digits'
+      });
+    }
+    
+    console.log(`🔍 Verifying OTP for ${phoneNumber}`);
+    
+    const result = await verifyOTP(phoneNumber, otp);
+    
+    if (!result.success) {
+      return res.status(400).json(result);
+    }
+    
+    res.status(200).json({
+      success: true,
+      message: 'OTP verified successfully'
+    });
+    
+  } catch (error) {
+    console.error('❌ Error in verifyOTP:', error);
     next(error);
   }
 };

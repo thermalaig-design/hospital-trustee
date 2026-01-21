@@ -1,5 +1,5 @@
 import React from 'react';
-import { Home as HomeIcon, Users, Clock, FileText, UserPlus, Pill, ChevronRight, LogOut, Menu, X } from 'lucide-react';
+import { Home as HomeIcon, Users, Clock, FileText, UserPlus, Pill, ChevronRight, LogOut, Menu, X, Shield } from 'lucide-react';
 
 const Sidebar = ({ isOpen, onClose, onNavigate, currentPage }) => {
   if (!isOpen) return null;
@@ -11,6 +11,7 @@ const Sidebar = ({ isOpen, onClose, onNavigate, currentPage }) => {
     { id: 'reports', label: 'Reports', icon: FileText },
     { id: 'reference', label: 'Patient Referral', icon: UserPlus },
     { id: 'medicines-booking', label: 'Medicines', icon: Pill },
+    { id: 'admin', label: 'Admin Panel', icon: Shield },
   ];
 
   return (

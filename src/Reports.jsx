@@ -32,7 +32,7 @@ const Reports = ({ onNavigate }) => {
         return;
       }
 
-      const response = await fetch('http://localhost:5001/api/reports', {
+      const response = await fetch('https://hospital-trustee-fiwe.vercel.app/api/reports', {
         headers: {
           'user-id': userId
         }
@@ -123,7 +123,7 @@ const Reports = ({ onNavigate }) => {
         return;
       }
 
-      const response = await fetch('http://localhost:5001/api/reports/upload', {
+      const response = await fetch('https://hospital-trustee-fiwe.vercel.app/api/reports/upload', {
         method: 'POST',
         headers: {
           'user-id': userId

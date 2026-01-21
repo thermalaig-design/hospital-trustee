@@ -1,11 +1,24 @@
 import React, { useState, useEffect } from 'react';
 import { User, Users, Clock, FileText, UserPlus, Bell, ChevronRight, LogOut, Heart, Shield, Plus, ArrowRight, Pill, ShoppingCart, Calendar, Stethoscope, Building2, Phone, QrCode, Monitor, Brain, Package, FileCheck, Search, Filter, MapPin, Star, HelpCircle, BookOpen, Video, Headphones, Menu, X, Home as HomeIcon, Settings, UserCircle } from 'lucide-react';
 import Sidebar from './components/Sidebar';
+import { getProfile, getMarqueeUpdates, getSponsors } from './services/api';
 
 /* eslint-disable react-refresh/only-export-components */
 const Home = ({ onNavigate, onLogout, isMember }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [userProfile, setUserProfile] = useState(null);
+  const [marqueeUpdates, setMarqueeUpdates] = useState([
+    'Free Cardiac Checkup Camp on March 29, 2026',
+    'New Specialist Dr. Neha Kapoor Joined',
+    '24x7 Emergency Helpline: 1800-XXX-XXXX',
+    'Tele Consultation Services Now Available',
+    'Home Delivery of Medicines Available',
+    'Free Health Camp at Main Hospital',
+    'New MRI Machine Installed',
+    'OPD Timings: 9 AM to 5 PM',
+    'Emergency Services Available 24/7',
+  ]);
+  const [sponsor, setSponsor] = useState(null);
 
   useEffect(() => {
     // Load profile from Supabase first, then fallback to localStorage
@@ -19,18 +32,12 @@ const Home = ({ onNavigate, onLogout, isMember }) => {
           if (userId) {
             // Try to load from Supabase
             try {
-              const response = await fetch('https://hospital-management-3-7z4c.onrender.com/api/profile', {
-                headers: {
-                  'user-id': userId
-                }
-              });
-              
-              const data = await response.json();
-              if (data.success && data.profile) {
+              const response = await getProfile();
+              if (response.success && response.profile) {
                 // Map database fields to profile format
                 const mappedProfile = {
-                  name: data.profile.name || '',
-                  profilePhotoUrl: data.profile.profile_photo_url || ''
+                  name: response.profile.name || '',
+                  profilePhotoUrl: response.profile.profile_photo_url || ''
                 };
                 setUserProfile(mappedProfile);
                 return;
@@ -54,6 +61,47 @@ const Home = ({ onNavigate, onLogout, isMember }) => {
     
     loadProfile();
   }, []);
+
+  // Load marquee updates from Supabase
+  useEffect(() => {
+    const loadMarqueeUpdates = async () => {
+      try {
+        const response = await getMarqueeUpdates();
+        if (response.success && response.data && response.data.length > 0) {
+          // Sort by priority (ascending) and map to message text
+          const updates = response.data
+            .sort((a, b) => (a.priority || 0) - (b.priority || 0))
+            .map(item => item.message);
+          setMarqueeUpdates(updates);
+          console.log('✅ Marquee updates loaded:', updates);
+        }
+      } catch (error) {
+        console.error('Error loading marquee updates:', error);
+        // Keep default updates if fetch fails
+      }
+    };
+
+    loadMarqueeUpdates();
+  }, []);
+
+  // Load sponsor data from Supabase
+  useEffect(() => {
+    const loadSponsor = async () => {
+      try {
+        const response = await getSponsors();
+        if (response.success && response.data && response.data.length > 0) {
+          // Get the first active sponsor (highest priority)
+          setSponsor(response.data[0]);
+          console.log('✅ Sponsor loaded:', response.data[0].name);
+        }
+      } catch (error) {
+        console.error('Error loading sponsor:', error);
+        // Keep default sponsor if fetch fails
+      }
+    };
+
+    loadSponsor();
+  }, []);
   // const recentNotices = [
   //   { id: 1, title: 'Free Cardiac Checkup', date: 'Dec 29, 2024', tag: 'Health Camp' },
   //   { id: 2, title: 'New Specialist Joined', date: 'Dec 28, 2024', tag: 'Hiring' },
@@ -65,28 +113,6 @@ const Home = ({ onNavigate, onLogout, isMember }) => {
     { id: 'reports', title: 'Reports', desc: 'Medical Test Results', icon: FileText, color: 'bg-orange-100', iconColor: 'text-orange-600', screen: 'reports' },
     { id: 'reference', title: 'Patient Referral', desc: 'Refer Patient to Doctor', icon: UserPlus, color: 'bg-teal-100', iconColor: 'text-teal-600', screen: 'reference' },
   ];
-
-  const marqueeUpdates = [
-    'Free Cardiac Checkup Camp on March 29, 2026',
-    'New Specialist Dr. Neha Kapoor Joined',
-    '24x7 Emergency Helpline: 1800-XXX-XXXX',
-    'Tele Consultation Services Now Available',
-    'Home Delivery of Medicines Available',
-    'Free Health Camp at Main Hospital',
-    'New MRI Machine Installed',
-    'OPD Timings: 9 AM to 5 PM',
-    'Emergency Services Available 24/7',
-  ];
-
-  // const services = [
-  //   { id: 'opd-registration', title: 'OPD Self Registration', icon: QrCode, color: 'bg-purple-500' },
-  //   { id: 'opd-appointment', title: 'OPD Appointment', icon: Calendar, color: 'bg-purple-500' },
-  //   { id: 'medicines-received', title: 'Medicines Received', icon: Pill, color: 'bg-purple-500' },
-  //   { id: 'teleconsultation', title: 'Tele Consultation', icon: Monitor, color: 'bg-purple-500' },
-  //   { id: 'home-delivery', title: 'Home Delivery of Medicines', icon: ShoppingCart, color: 'bg-purple-500' },
-  //   { id: 'tele-manas', title: 'Tele Manas', icon: Brain, color: 'bg-purple-500' },
-  //   { id: 'e-medical-pass', title: 'e-Medical Pass', icon: FileCheck, color: 'bg-purple-500' },
-  // ];
 
   // const enquiry = [
   //   { id: 'specialities', title: 'Availability of Specialities', icon: Stethoscope, color: 'bg-purple-500' },
@@ -106,7 +132,7 @@ const Home = ({ onNavigate, onLogout, isMember }) => {
   // ];
 
   return (
-    <div className="bg-white min-h-screen relative">
+    <div className="bg-white min-h-screen flex flex-col">
       {/* Navbar */}
       <div className="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between sticky top-0 z-50 shadow-sm">
         <button
@@ -176,21 +202,27 @@ const Home = ({ onNavigate, onLogout, isMember }) => {
         </div>
       </div>
 
-      {/* Single Marquee Updates */}
+      {/* Single Marquee Updates - Enhanced */}
       <div className="bg-gradient-to-r from-indigo-600 to-indigo-700 text-white overflow-hidden relative shadow-md">
-        <div className="py-2.5">
-          <div className="flex whitespace-nowrap" style={{ animation: 'marquee 25s linear infinite' }}>
+        <div className="py-3">
+          <div 
+            className="flex whitespace-nowrap" 
+            style={{ 
+              animation: `marquee ${Math.max(marqueeUpdates.length * 6, 40)}s linear infinite`,
+              width: 'max-content'
+            }}
+          >
             {marqueeUpdates.map((update, index) => (
               <div key={index} className="flex items-center mx-6 sm:mx-8 flex-shrink-0">
-                <Bell className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-2 flex-shrink-0" />
-                <span className="text-xs sm:text-sm font-semibold">{update}</span>
+                <Bell className="h-4 w-4 sm:h-5 sm:w-5 mr-2 flex-shrink-0" />
+                <span className="text-sm sm:text-base font-semibold">{update}</span>
               </div>
             ))}
             {/* Duplicate for seamless loop */}
             {marqueeUpdates.map((update, index) => (
               <div key={`dup-${index}`} className="flex items-center mx-6 sm:mx-8 flex-shrink-0">
-                <Bell className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-2 flex-shrink-0" />
-                <span className="text-xs sm:text-sm font-semibold">{update}</span>
+                <Bell className="h-4 w-4 sm:h-5 sm:w-5 mr-2 flex-shrink-0" />
+                <span className="text-sm sm:text-base font-semibold">{update}</span>
               </div>
             ))}
           </div>
@@ -202,99 +234,102 @@ const Home = ({ onNavigate, onLogout, isMember }) => {
           }
         `}</style>
       </div>
-
-      {/* Main Navigation Cards - Premium Design */}
-      <div className="px-4 sm:px-6 mt-4 sm:mt-6 mb-6 sm:mb-8">
-        <h2 className="text-base sm:text-lg font-bold text-gray-900 mb-3 sm:mb-4">Quick Actions</h2>
-        <div className="grid grid-cols-2 gap-3 sm:gap-4">
-          {quickActions.map((action) => (
-            <button
-              key={action.id}
-              onClick={() => onNavigate(action.screen)}
-              disabled={action.memberOnly && !isMember}
-              className={`bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-5 shadow-md border-2 border-gray-100 flex flex-col items-center text-center transition-all hover:shadow-xl hover:border-indigo-200 hover:-translate-y-1 active:scale-95 group relative overflow-hidden ${action.memberOnly && !isMember ? 'opacity-60' : ''}`}
-            >
-              <div className={`${action.color} p-3 sm:p-4 rounded-xl sm:rounded-2xl mb-2 sm:mb-3 group-hover:scale-110 transition-transform shadow-sm`}>
-                <action.icon className={`h-6 w-6 sm:h-7 sm:w-7 ${action.iconColor}`} />
-              </div>
-              <h3 className="font-bold text-gray-900 text-sm sm:text-base leading-tight mb-1 sm:mb-1.5">{action.title}</h3>
-              <p className="text-gray-600 text-[10px] sm:text-xs font-medium leading-snug">{action.desc}</p>
-              {action.memberOnly && !isMember && (
-                <span className="absolute top-3 right-3 bg-gray-100 text-gray-400 p-1.5 rounded-full shadow-sm"><Shield className="h-3.5 w-3.5" /></span>
-              )}
-            </button>
-          ))}
-        </div>
-      </div>
-
       
-      {/* <div className="pb-20"></div>
-      <div className="pb-20"></div> */}
-      {/* Sponsored By Banner - Footer */}
-      <div className="banner-container mt-6 w-full">
-        <div className="banner-content bg-gradient-to-r from-indigo-800 to-indigo-900 rounded-2xl sm:rounded-3xl overflow-hidden shadow-2xl border-2 border-indigo-700">
-          <div className="flex items-center justify-between p-1 sm:p-2">
-            {/* Left Side - Text Content */}
-            <div className="flex-1 pr-4">
-              {/* Decorative Line */}
-              <div className="flex items-center gap-2 mb-2">
-                <div className="h-px bg-gradient-to-r from-transparent via-indigo-300 to-indigo-300 flex-1"></div>
-                <span className="text-indigo-200 text-[10px] sm:text-xs font-light tracking-widest">SPONSORED BY</span>
-                <div className="h-px bg-gradient-to-r from-indigo-300 to-indigo-300 to-transparent flex-1"></div>
-              </div>
-
-              {/* Doctor Name */}
-              <h2 className="text-lg sm:text-l md:text-3xl font-serif italic text-white leading-tight">
-                Dr. Meena Subhash Gupta
-              </h2>
-            </div>
-
-            {/* Right Side - 3D Realistic Image */}
-            <div className="flex-shrink-0 w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 relative group" style={{ perspective: '1200px', transformStyle: 'preserve-3d' }}>
-              {/* Enhanced 3D Shadow Layers */}
-              <div className="absolute inset-0 bg-black/30 rounded-2xl transform translate-x-3 translate-y-3 blur-md opacity-50" style={{ transform: 'translateZ(-10px)' }}></div>
-              <div className="absolute inset-0 bg-black/15 rounded-2xl transform translate-x-2 translate-y-2 blur-lg opacity-70" style={{ transform: 'translateZ(-5px)' }}></div>
-              <div className="absolute inset-0 bg-black/5 rounded-2xl transform translate-x-1 translate-y-1 blur-xl opacity-80" style={{ transform: 'translateZ(-2px)' }}></div>
-
-              {/* Realistic 3D Image Container */}
-              <div className="relative flex items-center justify-center overflow-visible transform transition-all duration-700 group-hover:scale-110" style={{ transformStyle: 'preserve-3d' }}>
-                <div className="relative" style={{ transform: 'translateZ(40px) rotateX(10deg) rotateY(-8deg)' }}>
-                  <img
-                    src="./src/assets/president.png"
-                    alt="Dr. Meena Subhash Gupta"
-                    className="w-full h-full object-cover rounded-2xl shadow-2xl transform transition-all duration-700 group-hover:scale-105"
-                    style={{
-                      filter: 'drop-shadow(0 20px 35px rgba(0,0,0,0.5)) drop-shadow(0 8px 15px rgba(0,0,0,0.4)) drop-shadow(0 3px 6px rgba(0,0,0,0.3))',
-                      boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.1), 0 0 20px rgba(0,0,0,0.3)'
-                    }}
-                    onError={(e) => {
-                      e.target.style.display = 'none';
-                      e.target.nextSibling.style.display = 'flex';
-                    }}
-                  />
-                  {/* Realistic Lighting Overlay */}
-                  <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-white/20 via-transparent to-black/30 pointer-events-none"></div>
-                  {/* Fallback placeholder */}
-                  <div className="text-center" style={{ display: 'none' }}>
-                    <User className="h-10 w-10 sm:h-12 sm:w-12 text-gray-400 mx-auto mb-1" />
-                    <p className="text-gray-400 text-[10px] sm:text-xs font-medium">Photo</p>
-                  </div>
+      {/* Main Content - Flex grow to push banner to bottom */}
+        {/* Main Navigation Cards - Premium Design */}
+        <div className="px-4 sm:px-6 mt-6 sm:mt-6 ">  {/* Reduced bottom margin to decrease gap */}
+          <h2 className="text-base sm:text-lg font-bold text-gray-900 mb-3 sm:mb-4">Quick Actions</h2>
+          <div className="grid grid-cols-2 gap-3 mt-5 sm:gap-4">
+            {quickActions.map((action) => (
+              <button
+                key={action.id}
+                onClick={() => onNavigate(action.screen)}
+                disabled={action.memberOnly && !isMember}
+                className={`bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-5 shadow-md border-2 border-gray-100 flex flex-col items-center text-center transition-all hover:shadow-xl hover:border-indigo-200 hover:-translate-y-1 active:scale-95 group relative overflow-hidden ${action.memberOnly && !isMember ? 'opacity-60' : ''}`}
+              >
+                <div className={`${action.color} p-3 sm:p-4 rounded-xl sm:rounded-2xl mb-2 sm:mb-3 group-hover:scale-110 transition-transform shadow-sm`}>
+                  <action.icon className={`h-6 w-6 sm:h-7 sm:w-7 ${action.iconColor}`} />
                 </div>
-              </div>
-
-              {/* Enhanced 3D Light Effects */}
-              <div className="absolute top-2 left-2 w-6 h-6 bg-white/40 rounded-full blur-lg opacity-80" style={{ transform: 'translateZ(20px)' }}></div>
-              <div className="absolute bottom-2 right-2 w-4 h-4 bg-white/20 rounded-full blur-md opacity-60" style={{ transform: 'translateZ(15px)' }}></div>
-              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-12 h-12 bg-white/10 rounded-full blur-xl opacity-50" style={{ transform: 'translateZ(25px) translateX(-50%) translateY(-50%)' }}></div>
-            </div>
+                <h3 className="font-bold text-gray-900 text-sm sm:text-base leading-tight mb-1 sm:mb-1.5">{action.title}</h3>
+                <p className="text-gray-600 text-[10px] sm:text-xs font-medium leading-snug">{action.desc}</p>
+                {action.memberOnly && !isMember && (
+                  <span className="absolute top-3 right-3 bg-gray-100 text-gray-400 p-1.5 rounded-full shadow-sm"><Shield className="h-3.5 w-3.5" /></span>
+                )}
+              </button>
+            ))}
           </div>
         </div>
-      </div>
+
+
+        {/* Sponsored By Banner - Moved after quick actions */}
+        <div className="banner-container w-full mt-5 mb-0 " style={{ marginTop: '3rem' }}>  {/* Added padding for consistency */}
+          <button 
+            onClick={() => onNavigate('sponsor-details')}
+            className="w-full bg-gradient-to-r from-indigo-800 to-indigo-900 p-4 overflow-hidden shadow-2xl border-2 border-indigo-700 text-left"
+          >
+            <div className="flex items-center justify-between p-0.5 sm:p-1">
+              {/* Left Side - Text Content */}
+              <div className="flex-1 pr-4">
+                {/* Decorative Line */}
+                <div className="flex items-center gap-2 mb-1">
+                  <div className="h-px bg-gradient-to-r from-transparent via-indigo-300 to-indigo-300 flex-1"></div>
+                  <span className="text-indigo-200 text-[10px] sm:text-xs font-light tracking-widest">SPONSORED BY</span>
+                  <div className="h-px bg-gradient-to-r from-indigo-300 to-indigo-300 to-transparent flex-1"></div>
+                </div>
+
+                {/* Sponsor Name - Dynamic */}
+                <h2 className="text-sm sm:text-base md:text-lg font-serif italic text-white leading-tight">
+                  {sponsor ? sponsor.name : 'Dr. Meena Subhash Gupta'}
+                </h2>
+              </div>
+
+              {/* Right Side - 3D Realistic Image */}
+              <div className="flex-shrink-0 w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 relative group" style={{ perspective: '1200px', transformStyle: 'preserve-3d' }}>
+                {/* Enhanced 3D Shadow Layers */}
+                <div className="absolute inset-0 bg-black/30 rounded-2xl transform translate-x-3 translate-y-3 blur-md opacity-50" style={{ transform: 'translateZ(-10px)' }}></div>
+                <div className="absolute inset-0 bg-black/15 rounded-2xl transform translate-x-2 translate-y-2 blur-lg opacity-70" style={{ transform: 'translateZ(-5px)' }}></div>
+                <div className="absolute inset-0 bg-black/5 rounded-2xl transform translate-x-1 translate-y-1 blur-xl opacity-80" style={{ transform: 'translateZ(-2px)' }}></div>
+
+                {/* Realistic 3D Image Container */}
+                <div className="relative flex items-center justify-center overflow-visible transform transition-all duration-700 group-hover:scale-110" style={{ transformStyle: 'preserve-3d' }}>
+                  <div className="relative" style={{ transform: 'translateZ(40px) rotateX(10deg) rotateY(-8deg)' }}>
+                    <img
+                      src={sponsor ? sponsor.photo_url : '/assets/president.png'}
+                      alt={sponsor ? sponsor.name : 'Dr. Meena Subhash Gupta'}
+                      className="w-full h-full object-cover rounded-2xl shadow-2xl transform transition-all duration-700 group-hover:scale-105"
+                      style={{
+                        filter: 'drop-shadow(0 20px 35px rgba(0,0,0,0.5)) drop-shadow(0 8px 15px rgba(0,0,0,0.4)) drop-shadow(0 3px 6px rgba(0,0,0,0.3))',
+                        boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.1), 0 0 20px rgba(0,0,0,0.3)'
+                      }}
+                      onError={(e) => {
+                        e.target.style.display = 'none';
+                        e.target.nextSibling.style.display = 'flex';
+                      }}
+                    />
+                    {/* Realistic Lighting Overlay */}
+                    <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-white/20 via-transparent to-black/30 pointer-events-none"></div>
+                    {/* Fallback placeholder */}
+                    <div className="text-center" style={{ display: 'none' }}>
+                      <User className="h-8 w-8 sm:h-10 sm:w-10 text-gray-400 mx-auto mb-1" />
+                      <p className="text-gray-400 text-[10px] sm:text-xs font-medium">Photo</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Enhanced 3D Light Effects */}
+                <div className="absolute top-1 left-1 w-4 h-4 bg-white/40 rounded-full blur-lg opacity-80" style={{ transform: 'translateZ(20px)' }}></div>
+                <div className="absolute bottom-1 right-1 w-3 h-3 bg-white/20 rounded-full blur-md opacity-60" style={{ transform: 'translateZ(15px)' }}></div>
+                <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-8 h-8 bg-white/10 rounded-full blur-xl opacity-50" style={{ transform: 'translateZ(25px) translateX(-50%) translateY(-50%)' }}></div>
+              </div>
+            </div>
+          </button>
+        </div>
+      
       <style>{`
         .banner-container {
           width: 100%;
           max-width: 100%;
-          margin-top: 1.5rem;
+        
         }
         
         .banner-content {

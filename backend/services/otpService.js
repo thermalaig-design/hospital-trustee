@@ -1,4 +1,235 @@
 import { supabase } from '../config/supabase.js';
+import axios from 'axios';
+import process from 'process';
+
+// MSG91 Configuration
+const MSG91_AUTH_KEY = process.env.MSG91_AUTH_KEY;
+const MSG91_TEMPLATE_ID = process.env.MSG91_TEMPLATE_ID;
+const MSG91_SENDER_ID = process.env.MSG91_SENDER_ID || 'MAHLTH';
+const OTP_EXPIRY_MINUTES = parseInt(process.env.OTP_EXPIRY_MINUTES) || 5;
+const NODE_ENV = process.env.NODE_ENV || 'production';
+
+// In-memory OTP storage (for production, use Redis or database)
+const otpStore = new Map();
+
+/**
+ * Generate 6-digit OTP
+ */
+const generateOTP = () => {
+  return Math.floor(100000 + Math.random() * 900000).toString();
+};
+
+/**
+ * Send OTP via MSG91
+ */
+export const sendOTP = async (phoneNumber, otp) => {
+  try {
+    // Clean phone number
+    const cleanPhone = phoneNumber.replace(/\D/g, '');
+    
+    // Format for MSG91 (should be in international format with country code)
+    let formattedPhone;
+    if (cleanPhone.length === 10) {
+      // If it's a 10-digit number, assume it's Indian number and prepend 91
+      formattedPhone = `91${cleanPhone}`;
+    } else if (cleanPhone.length === 12 && cleanPhone.startsWith('91')) {
+      // If it already has 91 prefix, use as is
+      formattedPhone = cleanPhone;
+    } else if (cleanPhone.startsWith('+91') && cleanPhone.length === 13) {
+      // If it has +91 prefix, remove + and use
+      formattedPhone = cleanPhone.substring(1);
+    } else {
+      // For other formats, use as is
+      formattedPhone = cleanPhone;
+    }
+    
+    console.log(`📱 Sending OTP ${otp} to ${formattedPhone}`);
+    
+    // MSG91 API endpoint
+    const url = 'https://control.msg91.com/api/v5/otp';
+    
+    const payload = {
+      template_id: MSG91_TEMPLATE_ID,
+      mobile: formattedPhone,
+      authkey: MSG91_AUTH_KEY,
+      otp: otp,
+      // Optional: customize OTP length and expiry
+      otp_length: 6,
+      otp_expiry: OTP_EXPIRY_MINUTES
+    };
+    
+    const response = await axios.post(url, payload, {
+      headers: {
+        'Content-Type': 'application/json',
+        'authkey': MSG91_AUTH_KEY
+      }
+    });
+    
+    console.log('✅ MSG91 Response:', response.data);
+    
+    if (response.data.type === 'success') {
+      return {
+        success: true,
+        message: 'OTP sent successfully',
+        requestId: response.data.request_id
+      };
+    } else {
+      throw new Error(response.data.message || 'Failed to send OTP');
+    }
+    
+  } catch (error) {
+    console.error('❌ Error sending OTP via MSG91:', error.response?.data || error.message);
+    throw new Error('Failed to send OTP. Please try again.');
+  }
+};
+
+/**
+ * Verify OTP via MSG91
+ */
+export const verifyOTPWithMSG91 = async (phoneNumber, otp) => {
+  try {
+    const cleanPhone = phoneNumber.replace(/\D/g, '');
+    
+    // Format for MSG91 (should be in international format with country code)
+    let formattedPhone;
+    if (cleanPhone.length === 10) {
+      // If it's a 10-digit number, assume it's Indian number and prepend 91
+      formattedPhone = `91${cleanPhone}`;
+    } else if (cleanPhone.length === 12 && cleanPhone.startsWith('91')) {
+      // If it already has 91 prefix, use as is
+      formattedPhone = cleanPhone;
+    } else if (cleanPhone.startsWith('+91') && cleanPhone.length === 13) {
+      // If it has +91 prefix, remove + and use
+      formattedPhone = cleanPhone.substring(1);
+    } else {
+      // For other formats, use as is
+      formattedPhone = cleanPhone;
+    }
+    
+    console.log(`🔍 Verifying OTP ${otp} for ${formattedPhone}`);
+    
+    // MSG91 OTP verification endpoint
+    const url = 'https://control.msg91.com/api/v5/otp/verify';
+    
+    const payload = {
+      authkey: MSG91_AUTH_KEY,
+      mobile: formattedPhone,
+      otp: otp
+    };
+    
+    const response = await axios.post(url, payload, {
+      headers: {
+        'Content-Type': 'application/json',
+        'authkey': MSG91_AUTH_KEY
+      }
+    });
+    
+    console.log('✅ MSG91 Verify Response:', response.data);
+    
+    if (response.data.type === 'success') {
+      return {
+        success: true,
+        message: 'OTP verified successfully'
+      };
+    } else {
+      return {
+        success: false,
+        message: response.data.message || 'Invalid OTP'
+      };
+    }
+    
+  } catch (error) {
+    console.error('❌ Error verifying OTP:', error.response?.data || error.message);
+    return {
+      success: false,
+      message: 'Invalid or expired OTP'
+    };
+  }
+};
+
+/**
+ * Store OTP locally (backup method)
+ */
+const storeOTP = (phoneNumber, otp) => {
+  // Format phone number consistently for storage
+  const cleanPhone = phoneNumber.replace(/\D/g, '');
+  
+  // Format the phone number to a consistent format for storage
+  let formattedPhoneForStorage;
+  if (cleanPhone.length === 10) {
+    // If it's a 10-digit number, assume it's Indian number and prepend 91
+    formattedPhoneForStorage = `91${cleanPhone}`;
+  } else if (cleanPhone.length === 12 && cleanPhone.startsWith('91')) {
+    // If it already has 91 prefix, use as is
+    formattedPhoneForStorage = cleanPhone;
+  } else if (cleanPhone.startsWith('+91') && cleanPhone.length === 13) {
+    // If it has +91 prefix, remove + and use
+    formattedPhoneForStorage = cleanPhone.substring(1);
+  } else {
+    // For other formats, use as is
+    formattedPhoneForStorage = cleanPhone;
+  }
+  const expiryTime = Date.now() + (OTP_EXPIRY_MINUTES * 60 * 1000);
+  
+  otpStore.set(formattedPhoneForStorage, {
+    otp: otp,
+    expiryTime: expiryTime,
+    attempts: 0
+  });
+  
+  // Auto-delete after expiry
+  setTimeout(() => {
+    otpStore.delete(formattedPhoneForStorage);
+  }, OTP_EXPIRY_MINUTES * 60 * 1000);
+};
+
+/**
+ * Verify OTP locally (backup method)
+ */
+const verifyOTPLocal = (phoneNumber, otp) => {
+  // Format phone number consistently for storage
+  const cleanPhone = phoneNumber.replace(/\D/g, '');
+  
+  // Format the phone number to a consistent format for storage
+  let formattedPhoneForRetrieval;
+  if (cleanPhone.length === 10) {
+    // If it's a 10-digit number, assume it's Indian number and prepend 91
+    formattedPhoneForRetrieval = `91${cleanPhone}`;
+  } else if (cleanPhone.length === 12 && cleanPhone.startsWith('91')) {
+    // If it already has 91 prefix, use as is
+    formattedPhoneForRetrieval = cleanPhone;
+  } else if (cleanPhone.startsWith('+91') && cleanPhone.length === 13) {
+    // If it has +91 prefix, remove + and use
+    formattedPhoneForRetrieval = cleanPhone.substring(1);
+  } else {
+    // For other formats, use as is
+    formattedPhoneForRetrieval = cleanPhone;
+  }
+  
+  const stored = otpStore.get(formattedPhoneForRetrieval);
+  
+  if (!stored) {
+    return { success: false, message: 'OTP expired or not found' };
+  }
+  
+  if (Date.now() > stored.expiryTime) {
+    otpStore.delete(formattedPhoneForRetrieval);
+    return { success: false, message: 'OTP expired' };
+  }
+  
+  if (stored.attempts >= 3) {
+    otpStore.delete(formattedPhoneForRetrieval);
+    return { success: false, message: 'Too many failed attempts' };
+  }
+  
+  if (stored.otp === otp) {
+    otpStore.delete(formattedPhoneForRetrieval);
+    return { success: true, message: 'OTP verified successfully' };
+  }
+  
+  stored.attempts += 1;
+  return { success: false, message: 'Invalid OTP' };
+};
 
 /**
  * Check if phone number exists in any table
@@ -40,10 +271,8 @@ export const checkPhoneExists = async (phoneNumber) => {
     // Build search conditions for Members Table
     const conditions = [];
     uniquePatterns.forEach(pattern => {
-      // Add exact pattern match for the Mobile field
       conditions.push(`Mobile.ilike.%${pattern}%`);
       
-      // Also search for the pattern with common separators
       if (pattern.length === 10) {
         const formattedPatterns = [
           `${pattern.slice(0, 3)}-${pattern.slice(3, 6)}-${pattern.slice(6)}`,
@@ -61,7 +290,7 @@ export const checkPhoneExists = async (phoneNumber) => {
     
     const searchCondition = conditions.join(',');
     
-    // Check in Members Table - SELECT ALL FIELDS
+    // Check in Members Table
     const { data: memberData, error: memberError } = await supabase
       .from('Members Table')
       .select(`
@@ -86,50 +315,42 @@ export const checkPhoneExists = async (phoneNumber) => {
     
     if (memberData && memberData.length > 0) {
       console.log('✅ Phone found in Members Table');
-      console.log('📋 Full member data:', JSON.stringify(memberData[0], null, 2));
-      
       const member = memberData[0];
       
-      // Check if this member is also in elected_members table via membership_number
+      // Check if this member is also in elected_members table
       let electedMemberData = null;
       if (member['Membership number']) {
         try {
-          // Clean membership_number for matching
           const cleanMembership = String(member['Membership number']).trim();
           
-          // Try exact match first
-          let { data: electedMatch, error: electedError } = await supabase
+          let { data: electedMatch } = await supabase
             .from('elected_members')
             .select('*')
             .eq('membership_number', cleanMembership)
             .limit(1);
           
-          // If no exact match, try case-insensitive search
-          if ((!electedMatch || electedMatch.length === 0) && !electedError) {
-            const { data: electedMatchIlike, error: electedErrorIlike } = await supabase
+          if (!electedMatch || electedMatch.length === 0) {
+            const { data: electedMatchIlike } = await supabase
               .from('elected_members')
               .select('*')
               .ilike('membership_number', `%${cleanMembership}%`)
               .limit(1);
             
-            if (!electedErrorIlike && electedMatchIlike && electedMatchIlike.length > 0) {
+            if (electedMatchIlike && electedMatchIlike.length > 0) {
               electedMatch = electedMatchIlike;
-              electedError = null;
             }
           }
           
-          if (!electedError && electedMatch && electedMatch.length > 0) {
+          if (electedMatch && electedMatch.length > 0) {
             electedMemberData = electedMatch[0];
-            console.log(`✅ Member is also in elected_members table with membership_number ${member['Membership number']}`);
+            console.log(`✅ Member is also in elected_members table`);
           }
         } catch (err) {
-          console.warn('Could not check elected_members for member:', err);
+          console.warn('Could not check elected_members:', err);
         }
       }
       
-      // Merge members table data with elected_members data if found
       const mergedUser = {
-        // Base Members Table fields
         'S. No.': member['S. No.'],
         'Membership number': member['Membership number'],
         'Name': member['Name'],
@@ -143,7 +364,6 @@ export const checkPhoneExists = async (phoneNumber) => {
         'type': member.type,
         position: member.position || null,
         
-        // Add elected_members fields if found
         ...(electedMemberData && {
           position: electedMemberData.position || member.position || null,
           location: electedMemberData.location || null,
@@ -152,7 +372,6 @@ export const checkPhoneExists = async (phoneNumber) => {
           is_merged_with_elected: true
         }),
         
-        // Normalized fields for easy access
         id: member['S. No.'],
         name: member['Name'],
         mobile: member['Mobile'],
@@ -166,10 +385,6 @@ export const checkPhoneExists = async (phoneNumber) => {
       };
     }
     
-    // Note: elected_members table doesn't have phone field in the provided SQL
-    // So we skip direct phone search in elected_members
-    // Instead, we check elected_members via membership_number when found in Members Table (handled above)
-    
     // Check in opd_schedule
     const opdConditions = [];
     uniquePatterns.forEach(pattern => {
@@ -178,7 +393,7 @@ export const checkPhoneExists = async (phoneNumber) => {
     
     const opdSearchCondition = opdConditions.join(',');
     
-    const { data: opdData, error: _opdError } = await supabase
+    const { data: opdData } = await supabase
       .from('opd_schedule')
       .select('id, mobile, consultant_name, department, designation')
       .or(opdSearchCondition)
@@ -209,7 +424,7 @@ export const checkPhoneExists = async (phoneNumber) => {
     
     const hospitalSearchCondition = hospitalConditions.join(',');
     
-    const { data: hospitalData, error: _hospitalError } = await supabase
+    const { data: hospitalData } = await supabase
       .from('hospitals')
       .select('id, hospital_name, contact_phone, trust_name')
       .or(hospitalSearchCondition)
@@ -243,33 +458,10 @@ export const checkPhoneExists = async (phoneNumber) => {
   }
 };
 
-/**
- * Validate phone number format
- */
-const validatePhoneNumber = (phoneNumber) => {
-  // Remove all non-digits
-  const cleanPhone = phoneNumber.replace(/\D/g, '');
-  
-  // Check if it's a valid Indian mobile number (10 digits)
-  if (cleanPhone.length === 10) {
-    return `+91${cleanPhone}`;
-  }
-  
-  // Check if it already has country code
-  if (cleanPhone.length === 12 && cleanPhone.startsWith('91')) {
-    return `+${cleanPhone}`;
-  }
-  
-  // Check if it already has + and country code
-  if (phoneNumber.startsWith('+91') && cleanPhone.length === 12) {
-    return phoneNumber;
-  }
-  
-  throw new Error('Invalid phone number format. Must be 10 digits.');
-};
+
 
 /**
- * Initialize phone auth (check if phone exists in system)
+ * Initialize phone auth and send OTP
  */
 export const initializePhoneAuth = async (phoneNumber) => {
   try {
@@ -283,22 +475,86 @@ export const initializePhoneAuth = async (phoneNumber) => {
       };
     }
     
-    // Validate and format phone number
-    const formattedPhone = validatePhoneNumber(phoneNumber);
+    // Format phone number for MSG91 (should be in international format with country code)
+    const cleanPhone = phoneNumber.replace(/\D/g, '');
+    let formattedPhone;
+    if (cleanPhone.length === 10) {
+      // If it's a 10-digit number, assume it's Indian number and prepend 91
+      formattedPhone = `91${cleanPhone}`;
+    } else if (cleanPhone.length === 12 && cleanPhone.startsWith('91')) {
+      // If it already has 91 prefix, use as is
+      formattedPhone = cleanPhone;
+    } else if (cleanPhone.startsWith('+91') && cleanPhone.length === 13) {
+      // If it has +91 prefix, remove + and use
+      formattedPhone = cleanPhone.substring(1);
+    } else {
+      // For other formats, use as is
+      formattedPhone = cleanPhone;
+    }
     
-    console.log(`📱 Phone number verified in database: ${formattedPhone}`);
+    // Generate OTP
+    const otp = generateOTP();
+    
+    // Store OTP locally as backup
+    storeOTP(phoneNumber, otp);
+    
+    // Send OTP via MSG91
+    const sendResult = await sendOTP(formattedPhone, otp);
+    
+    if (!sendResult.success) {
+      throw new Error('Failed to send OTP');
+    }
+    
+    console.log(`📱 OTP sent successfully to ${formattedPhone}`);
     
     return {
       success: true,
-      message: 'Phone number verified in database',
+      message: 'OTP sent successfully',
       data: {
         phoneNumber: formattedPhone,
-        user: phoneCheck.user
+        user: phoneCheck.user,
+        requestId: sendResult.requestId
       }
     };
     
   } catch (error) {
-    console.error('❌ Error checking phone number:', error);
+    console.error('❌ Error in initializePhoneAuth:', error);
     throw error;
+  }
+};
+
+/**
+ * Verify OTP
+ */
+export const verifyOTP = async (phoneNumber, otp) => {
+  try {
+    console.log(`🔍 Verifying OTP for ${phoneNumber}`);
+    
+    // 🔧 DEVELOPMENT MODE BYPASS - Accept 123456 as master OTP
+    if (NODE_ENV === 'development' && otp === '123456') {
+      console.log('🔧 DEVELOPMENT MODE: Bypassing OTP verification with master code 123456');
+      return {
+        success: true,
+        message: 'OTP verified successfully (Development mode)'
+      };
+    }
+    
+    // First try MSG91 verification
+    const msg91Result = await verifyOTPWithMSG91(phoneNumber, otp);
+    
+    if (msg91Result.success) {
+      return msg91Result;
+    }
+    
+    // Fallback to local verification
+    console.log('⚠️ MSG91 verification failed, trying local verification');
+    return verifyOTPLocal(phoneNumber, otp);
+    
+  } catch (error) {
+    console.error('❌ Error verifying OTP:', error);
+    return {
+      success: false,
+      message: 'Failed to verify OTP'
+    };
   }
 };
